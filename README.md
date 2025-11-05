@@ -24,6 +24,36 @@ MySQL (or use SQLite as a fallback)
 Git
 A code editor (e.g., VS Code)
 
+Step 1: Clone the Repository 
+git clone https://github.com/your-username/fitness-tracker.git
+cd fitness-tracker
+
+Step 2: Create a Virtual Environment 
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+
+Step 3: Install Dependencies 
+pip install -r requirements.txt
+If requirements.txt doesn't exist, install manually:
+pip install django mysqlclient
+
+Step 4: Configure the Database
+For MySQL: Create a database named fitness_tracker_db and update fitness_tracker/settings.py with your credentials.
+For SQLite: Change the database engine in settings.py to 'django.db.backends.sqlite3' and set 'NAME': BASE_DIR / 'db.sqlite3'.
+
+Step 5: Run Migrations
+python manage.py makemigrations
+python manage.py migrate
+
+Step 6: Create a Superuser
+python manage.py createsuperuser
+Follow the prompts to set up an admin account.
+
+Step 7: Configure Email (SMTP)
+Update fitness_tracker/settings.py with your SMTP details (e.g., Gmail):
+
+
+
 ...
 Step 8: Run the Development Server
 bash
