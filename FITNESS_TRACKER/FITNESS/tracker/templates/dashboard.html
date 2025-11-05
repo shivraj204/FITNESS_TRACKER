@@ -1,0 +1,80 @@
+# ...existing code...
+{% extends 'tracker/base.html' %}
+{% load static %}
+{% block content %}
+<h1>Welcome, {{ user.username }}!</h1>
+<div class="row">
+    <div class="col-md-6">
+        <h3>Today's Log</h3>
+        <p>Steps: {{ log.steps }}</p>
+        <p>Calories Consumed: {{ log.calories_consumed }}</p>
+        <p>Water Glasses: {{ log.water_glasses }}</p>
+    </div>
+    <div class="col-md-6">
+        <canvas id="workoutChart"></canvas>
+    </div>
+</div>
+<div class="row mt-4">
+    <div class="col-md-12">
+        <canvas id="stepsChart"></canvas>
+    </div>
+</div>
+
+{# Safely expose JSON data to JS using json_script #}
+{{ workout_dates|json_script:"workout_dates" }}
+{{ calories_burned|json_script:"calories_burned" }}
+{{ steps_data|json_script:"steps_data" }}
+
+{# Include Chart.js (CDN) and initialize charts only if data & elements exist #}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    (function() {
+        function safeParse(id) {
+            const el = document.getElementById(id);
+            if (!el) return null;
+            try { return JSON.parse(el.textContent); } catch (e) { return null; }
+        }
+
+        const labels = safeParse('workout_dates') || [];
+        const calories = safeParse('calories_burned') || [];
+        const steps = safeParse('steps_data') || [];
+
+        const workoutCanvas = document.getElementById('workoutChart');
+        if (workoutCanvas && typeof Chart !== 'undefined') {
+            const ctx1 = workoutCanvas.getContext('2d');
+            new Chart(ctx1, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Calories Burned',
+                        data: calories,
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        backgroundColor: 'rgba(75, 192, 192, 0.1)',
+                        fill: false,
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false }
+            });
+        }
+
+        const stepsCanvas = document.getElementById('stepsChart');
+        if (stepsCanvas && typeof Chart !== 'undefined') {
+            const ctx2 = stepsCanvas.getContext('2d');
+            new Chart(ctx2, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Steps',
+                        data: steps,
+                        backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false }
+            });
+        }
+    })();
+</script>
+{% endblock %}
+# ...existing code...
